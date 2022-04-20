@@ -1,6 +1,7 @@
-use crate::game::{GameImpl,build_GameImpl};
+#![cfg(test)]
+use crate::game::{build_GameImpl};
 use crate::framework::*;
-use crate::framework::{Game, Position, Piece::*, Player::*};
+use crate::framework::{Game, Position, Piece::*, Player::{White}};
 
 #[test]
 fn should_be_white_rook_at_1A() {
