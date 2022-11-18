@@ -1,11 +1,7 @@
 pub trait Game {
-    fn move_(&mut self, from: &Position, to: &Position) -> bool;
-    fn get_piece(&self, position: &Position) -> &Piece;
-    fn add_game_observer(&mut self, observer: &dyn GameObserver);
-}
-
-pub trait GameObserver {
-    fn tile_changed_at(&self, pos: &Position);
+    type Game;
+    fn move_(self, from: Position, to: Position) -> Result<Self::Game,String>;
+    fn get_piece(&self, position: Position) -> Option<&Piece>;
 }
 
 pub trait Gui {
@@ -20,8 +16,7 @@ pub enum Piece {
     Knight(Player),
     Bishop(Player),
     King(Player),
-    Queen(Player),
-    None,
+    Queen(Player)
 }
 
 
@@ -33,7 +28,17 @@ pub enum Player {
 }
 
 
+#[derive(PartialEq)]
+#[derive(Eq)]
+#[derive(Hash)]
+#[derive(Clone, Copy)]
 pub struct Position {
     pub x_pos: char,
     pub y_pos: usize,
+}
+
+impl std::fmt::Display for Position {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "{}{}", self.x_pos, self.y_pos)
+    }
 }

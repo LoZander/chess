@@ -1,61 +1,72 @@
+use std::collections::HashMap;
+
 use crate::framework::*;
-use crate::framework::{Piece::*, Player::*, GameObserver};
+use crate::framework::{Piece::*, Player::*};
+
 
 pub struct GameImpl {
-    pieces_grid: Vec<Vec<Piece>>,
+    pieces_grid: HashMap<Position, Piece>,
 }
 
-pub fn build_GameImpl() -> GameImpl {
+fn piece_entry (x_pos: char, y_pos: usize, piece: Piece) -> (Position, Piece) { (Position {x_pos, y_pos}, piece) }
+
+pub fn build_game_impl() -> GameImpl {
     GameImpl {
-        pieces_grid: vec![vec![Rook(White), Knight(White),  Bishop(White),  King(White), Queen(White),  Bishop(White), Knight(White), Rook(White)],
-                          vec![Pawn(White), Pawn(White),    Pawn(White),    Pawn(White), Pawn(White),   Pawn(White),   Pawn(White),   Pawn(White)],
-                          vec![None,        None,           None,           None,        None,          None,          None,          None],
-                          vec![None,        None,           None,           None,        None,          None,          None,          None],
-                          vec![None,        None,           None,           None,        None,          None,          None,          None],
-                          vec![None,        None,           None,           None,        None,          None,          None,          None],
-                          vec![Pawn(Black), Pawn(Black),    Pawn(Black),    Pawn(Black), Pawn(Black),   Pawn(Black),   Pawn(Black),   Pawn(Black)],
-                          vec![Rook(Black), Knight(Black),  Bishop(Black),  King(Black), Queen(Black),  Bishop(Black), Knight(Black), Rook(Black)]]
-    }
-}
+        pieces_grid: HashMap::from([
+            piece_entry ('A', 1, Rook(White)),
+            piece_entry ('B', 1, Knight(White)),
+            piece_entry ('C', 1, Bishop(White)),
+            piece_entry ('D', 1, King(White)),
+            piece_entry ('E', 1, Queen(White)),
+            piece_entry ('F', 1, Bishop(White)),
+            piece_entry ('G', 1, Knight(White)),
+            piece_entry ('H', 1, Rook(White)),
+            
+            piece_entry ('A', 2, Pawn(White)),
+            piece_entry ('B', 2, Pawn(White)),
+            piece_entry ('C', 2, Pawn(White)),
+            piece_entry ('D', 2, Pawn(White)),
+            piece_entry ('E', 2, Pawn(White)),
+            piece_entry ('F', 2, Pawn(White)),
+            piece_entry ('G', 2, Pawn(White)),
+            piece_entry ('H', 2, Pawn(White)),
 
+            piece_entry ('A', 8, Rook(Black)),
+            piece_entry ('B', 8, Knight(Black)),
+            piece_entry ('C', 8, Bishop(Black)),
+            piece_entry ('D', 8, King(Black)),
+            piece_entry ('E', 8, Queen(Black)),
+            piece_entry ('F', 8, Bishop(Black)),
+            piece_entry ('G', 8, Knight(Black)),
+            piece_entry ('H', 8, Rook(Black)),
+            
+            piece_entry ('A', 7, Pawn(Black)),
+            piece_entry ('B', 7, Pawn(Black)),
+            piece_entry ('C', 7, Pawn(Black)),
+            piece_entry ('D', 7, Pawn(Black)),
+            piece_entry ('E', 7, Pawn(Black)),
+            piece_entry ('F', 7, Pawn(Black)),
+            piece_entry ('G', 7, Pawn(Black)),
+            piece_entry ('H', 7, Pawn(Black)),
+            ])
+        }
+    }
+    
 impl Game for GameImpl {
-    fn move_(&mut self, from: &Position, to: &Position) -> bool { 
-        let to_x_pos = number_from_char(to.x_pos);
-        let to_y_pos = to.y_pos;
+    type Game=GameImpl;
+    fn move_(mut self, from: Position, to: Position) -> Result<Self::Game,String> {
+        let piece = self.pieces_grid.remove(&from);
+        match piece {
+            None => Err(format!("No piece at {}", from)),
+            Some(p) => {
+                self.pieces_grid.insert(to, p); 
+                Ok(self)
+            }
+        }
+    }
 
-        let piece = extract_piece(self, from);
-        self.pieces_grid[to_y_pos - 1][to_x_pos - 1] = piece;
-        return true;
+    fn get_piece(&self, position: Position) -> Option<&Piece> {
+        self.pieces_grid.get(&position)
     }
-    fn get_piece(&self, position: &Position) -> &Piece {
-        let x_pos = number_from_char(position.x_pos);
-        let y_pos = position.y_pos;
-        let piece = &self.pieces_grid[y_pos - 1][x_pos - 1];
-        return piece;
-    }
-    fn add_game_observer(&mut self, _: &dyn GameObserver) { 
-        todo!()
-    }
-}
 
-fn extract_piece(game: &mut GameImpl, position: &Position) -> Piece {
-    let x_pos = number_from_char(position.x_pos);
-    let y_pos = position.y_pos;
-    let replace = game.pieces_grid[y_pos - 1].remove(x_pos - 1);
-    game.pieces_grid[y_pos - 1].insert(x_pos - 1,None);
-    return replace;
-}
-
-fn number_from_char(c: char) -> usize {
-    match c {
-        'A' => 1,
-        'B' => 2,
-        'C' => 3,
-        'D' => 4,
-        'E' => 5,
-        'F' => 6,
-        'G' => 7,
-        'H' => 8,
-        _ => panic!()
-    }
 }
