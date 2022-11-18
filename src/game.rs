@@ -1,5 +1,5 @@
 use crate::framework::*;
-use crate::framework::{Piece::*, Player::*};
+use crate::framework::{Piece::*, Player::*, GameObserver};
 
 pub struct GameImpl {
     pieces_grid: Vec<Vec<Piece>>,
@@ -33,6 +33,9 @@ impl Game for GameImpl {
         let piece = &self.pieces_grid[y_pos - 1][x_pos - 1];
         return piece;
     }
+    fn add_game_observer(&mut self, _: &dyn GameObserver) { 
+        todo!()
+    }
 }
 
 fn extract_piece(game: &mut GameImpl, position: &Position) -> Piece {
@@ -42,8 +45,6 @@ fn extract_piece(game: &mut GameImpl, position: &Position) -> Piece {
     game.pieces_grid[y_pos - 1].insert(x_pos - 1,None);
     return replace;
 }
-
-
 
 fn number_from_char(c: char) -> usize {
     match c {

@@ -1,6 +1,8 @@
 mod framework;
 mod game;
 mod tests;
+mod cmdgui;
+mod demos;
 use framework::*;
 
 fn main() {
