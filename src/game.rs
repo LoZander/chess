@@ -83,7 +83,7 @@ fn is_move_valid (from: Pos, to: Pos, p: Piece) -> Result<Piece,String> {
             } else {
                 Err(format!("Illegal move: Pawn cannot move in such a manner"))
             }.and_then(|p|
-                if from.1 <= to.1 {
+                if from.1 < to.1 {
                     Ok(p)
                 } else {
                     Err(format!("Illegal move: Pawn cannot move in such a manner"))
