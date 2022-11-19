@@ -51,27 +51,71 @@ pub fn build_game_impl() -> GameImpl {
     
 impl Game for GameImpl {
     type Game = GameImpl;
-    fn move_(mut self, from: Pos, to: Pos) -> Result<Self,String> {
-        let piece = self.pieces_grid.remove(&from);
-        piece.ok_or(format!("No piece at {}", from))
-             .and_then(|x| 
-                if from.0 == to.0 {
-                    Ok(x)
-                } else {
-                    Err(format!("Illegal move: Pawn cannot move in such a manner"))
-                })
-             .and_then(|p|
-                if from.1 <= to.1 {
-                    Ok(p)
-                } else {
-                    Err(format!("Illegal move: Pawn cannot move in such a manner"))
-                })
-             .map(|x| {self.pieces_grid.insert(to, x); self})
+    fn move_(self, from: Pos, to: Pos) -> Result<Self,String> {
+        let (game, piece) = remove(from, self)?;
+        let piece = is_move_valid(from,to,piece)?;
+        let game = add(to, piece, game);
+        Ok(game)
     }
 
     fn get_piece(&self, position: Pos) -> Option<&Piece> {
         self.pieces_grid.get(&position)
     }
+}
+
+fn add(pos: Pos, piece: Piece, mut game: GameImpl) -> GameImpl {
+    game.pieces_grid.insert(pos, piece);
+    game
+}
+
+fn remove(from: Pos, mut game: GameImpl) -> Result<(GameImpl,Piece),String> {
+    let piece = game.pieces_grid.remove(&from).ok_or(format!("No piece at {}", from))?;
+    Ok((game, piece))
+}
+
+fn is_move_valid (from: Pos, to: Pos, p: Piece) -> Result<Piece,String> {
+    let int_from = int_pos(from)?;
+    let int_to = int_pos(to)?;
+    match p {
+        Pawn(White) => 
+            if from.0 == to.0 {
+                Ok(p)
+            } else {
+                Err(format!("Illegal move: Pawn cannot move in such a manner"))
+            }.and_then(|p|
+                if from.1 <= to.1 {
+                    Ok(p)
+                } else {
+                    Err(format!("Illegal move: Pawn cannot move in such a manner"))
+                }),
+        Knight(White) =>
+            match (int_to.0 - int_from.0, int_to.1 - int_from.1) {
+                (1,2) |
+                (-1,2) |
+                (1,-2) |
+                (-1,-2) |
+                (2,1) |
+                (-2,1) |
+                (2,-1) |
+                (-2,-1) => Ok(p),
+                _ => Err(format!("Illegal move: Knight cannot move in such a manner"))
+            }
+        _ => panic!()
+    }
+}
+
+fn int_pos(Pos(x,y): Pos) -> Result<(i8, i8), String> {
+    match x {
+        'A' => Ok(1),
+        'B' => Ok(2),
+        'C' => Ok(3),
+        'D' => Ok(4),
+        'E' => Ok(5),
+        'F' => Ok(6),
+        'G' => Ok(7),
+        'H' => Ok(8),
+        c => Err(format!("Cannot translate '{}' into a number as it's not a valid chessboard letter", c))
+    }.map(|x| (x,y))
 }
 
 impl std::fmt::Display for Piece {

@@ -33,7 +33,7 @@ pub enum Player {
 #[derive(Eq)]
 #[derive(Hash)]
 #[derive(Clone, Copy)]
-pub struct Pos(pub char, pub usize);
+pub struct Pos(pub char, pub i8);
 
 impl std::fmt::Display for Pos {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {

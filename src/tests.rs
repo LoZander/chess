@@ -64,3 +64,14 @@ fn white_pawn_cant_move_backwards() {
         Err (e) => assert_eq!("Illegal move: Pawn cannot move in such a manner", e)
     }
 }
+
+#[test]
+fn white_knight_can_move_in_L_shape() {
+    let game = build_game_impl();
+    let game = game.move_(Pos('G',1), Pos('F',3)).unwrap();
+    
+    match game.get_piece(Pos('F',3)) {
+        None => assert!(false),
+        Some(p) => assert_eq!(&Knight(White), p)
+    }
+}
