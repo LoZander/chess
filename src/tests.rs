@@ -66,12 +66,21 @@ fn white_pawn_cant_move_backwards() {
 }
 
 #[test]
-fn white_knight_can_move_in_L_shape() {
+fn white_knight_can_move_in_l_shape() {
     let game = build_game_impl();
     let game = game.move_(Pos('G',1), Pos('F',3)).unwrap();
     
     match game.get_piece(Pos('F',3)) {
         None => assert!(false),
         Some(p) => assert_eq!(&Knight(White), p)
+    }
+}
+
+#[test]
+fn white_knight_cant_move_forward() {
+    let game = build_game_impl();
+    match game.move_(Pos('G',1), Pos('G',2)) {
+        Err(e) => assert_eq!("Illegal move: Knight cannot move in such a manner",e),
+        Ok(_) => assert!(false)
     }
 }
