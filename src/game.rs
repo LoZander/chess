@@ -8,46 +8,64 @@ pub struct GameImpl {
     pieces_grid: HashMap<Pos, Piece>
 }
 
-pub fn build_game_impl() -> GameImpl {
-    GameImpl {
-        pieces_grid: HashMap::from([
-            (Pos('A', 1), Rook(White)),
-            (Pos('B', 1), Knight(White)),
-            (Pos('C', 1), Bishop(White)),
-            (Pos('D', 1), Queen(White)),
-            (Pos('E', 1), King(White)),
-            (Pos('F', 1), Bishop(White)),
-            (Pos('G', 1), Knight(White)),
-            (Pos('H', 1), Rook(White)),
-
-            (Pos('A', 2), Pawn(White)),
-            (Pos('B', 2), Pawn(White)),
-            (Pos('C', 2), Pawn(White)),
-            (Pos('D', 2), Pawn(White)),
-            (Pos('E', 2), Pawn(White)),
-            (Pos('F', 2), Pawn(White)),
-            (Pos('G', 2), Pawn(White)),
-            (Pos('H', 2), Pawn(White)),
-            (Pos('A', 8), Rook(Black)),
-            (Pos('B', 8), Knight(Black)),
-            (Pos('C', 8), Bishop(Black)),
-            (Pos('D', 8), Queen(Black)),
-            (Pos('E', 8), King(Black)),
-            (Pos('F', 8), Bishop(Black)),
-            (Pos('G', 8), Knight(Black)),
-            (Pos('H', 8), Rook(Black)),
-
-            (Pos('A', 7), Pawn(Black)),
-            (Pos('B', 7), Pawn(Black)),
-            (Pos('C', 7), Pawn(Black)),
-            (Pos('D', 7), Pawn(Black)),
-            (Pos('E', 7), Pawn(Black)),
-            (Pos('F', 7), Pawn(Black)),
-            (Pos('G', 7), Pawn(Black)),
-            (Pos('H', 7), Pawn(Black)),
+impl GameImpl {
+    pub fn new() -> Result<Self,String> {
+        Self::build_game(&[
+            "RNBKQBNR",
+            "PPPPPPPP",
+            "        ",
+            "        ",
+            "        ",
+            "        ",
+            "pppppppp",
+            "rnbkqbnr",
             ])
+    }
+    pub fn build_game(pieces: &[&'static str] ) -> Result<GameImpl,String> {
+        let mut map: HashMap<Pos,Piece> = HashMap::new();
+        for (j,s) in pieces.iter().rev().enumerate() {
+            for (i,c) in s.char_indices() {
+                let p = piece_from_char(c);
+                match p {
+                    None => (),
+                    Some(p) => {map.insert(Pos::from(i as i8 + 1,j as i8 + 1)?, p); ()}
+                }
+            }
+        }
+        Ok(GameImpl{pieces_grid: map})
+    }    
+    pub fn print(self: &GameImpl) {
+        for i in (1..9).rev() {
+            for j in 'A'..'I' {
+                let pos = Pos(j, i);
+                match self.get_piece(pos) {
+                    None => print!(" "),
+                    Some(p) => print!("{p}")
+                };
+                print!("  ")
+            }
+            print!("\n")
         }
     }
+}
+
+fn piece_from_char(c: char) -> Option<Piece> {
+    match c {
+        'p' => Some(Pawn(White)),
+        'P' => Some(Pawn(Black)),
+        'r' => Some(Rook(White)),
+        'R' => Some(Rook(Black)),
+        'b' => Some(Bishop(White)),
+        'B' => Some(Bishop(Black)),
+        'n' => Some(Knight(White)),
+        'N' => Some(Knight(Black)),
+        'k' => Some(King(White)),
+        'K' => Some(King(Black)),
+        'q' => Some(Queen(White)),
+        'Q' => Some(Queen(Black)),
+        _ => None
+    }
+}
     
 impl Game for GameImpl {
     type Game = GameImpl;
@@ -88,7 +106,7 @@ fn is_move_valid (from: Pos, to: Pos, p: Piece) -> Result<Piece,String> {
                 } else {
                     Err(format!("Illegal move: Pawn cannot move in such a manner"))
                 }),
-        Knight(White) =>
+        Knight(_) =>
             match (int_to.0 - int_from.0, int_to.1 - int_from.1) {
                 (1,2) |
                 (-1,2) |
@@ -100,6 +118,15 @@ fn is_move_valid (from: Pos, to: Pos, p: Piece) -> Result<Piece,String> {
                 (-2,-1) => Ok(p),
                 _ => Err(format!("Illegal move: Knight cannot move in such a manner"))
             }
+        Bishop(_) => {
+            let dif_0 = int_to.0 - int_from.0;
+            let dif_1 = int_to.1 - int_from.1;
+            if dif_0 == dif_1 || dif_0 == -dif_1 {
+                Ok(p)
+            } else {
+                Err(format!("Illegal move: Bishop cannot move in such a manner"))
+            }
+        }
         _ => panic!()
     }
 }
@@ -136,19 +163,5 @@ impl std::fmt::Display for Piece {
         };
 
         write!(f, "{symbol}")
-    }
-}
-
-pub fn print_board(game: &GameImpl) {
-    for i in (1..9).rev() {
-        for j in 'A'..'I' {
-            let pos = Pos(j, i);
-            match game.get_piece(pos) {
-                None => print!(" "),
-                Some(p) => print!("{p}")
-            };
-            print!("  ")
-        }
-        print!("\n")
     }
 }

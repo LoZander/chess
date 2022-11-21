@@ -40,3 +40,21 @@ impl std::fmt::Display for Pos {
         write!(f, "{}{}", self.0, self.1)
     }
 }
+
+impl Pos {
+    pub fn from(x: i8,y: i8) -> Result<Self,String> {
+        let z = match x {
+            1 => Ok('A'),
+            2 => Ok('B'),
+            3 => Ok('C'),
+            4 => Ok('D'),
+            5 => Ok('E'),
+            6 => Ok('F'),
+            7 => Ok('G'),
+            8 => Ok('H'),
+            _ => Err("Error: illegal pos value")
+        }?;
+
+        Ok(Pos(z,y))
+    }
+}
