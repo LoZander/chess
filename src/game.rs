@@ -28,7 +28,7 @@ impl GameImpl {
                 let p = piece_from_char(c);
                 match p {
                     None => (),
-                    Some(p) => {map.insert(Pos::from(i as i8 + 1,j as i8 + 1)?, p); ()}
+                    Some(p) => {map.insert(Pos(i as i8 + 1,j as i8 + 1), p); ()}
                 }
             }
         }
@@ -36,7 +36,7 @@ impl GameImpl {
     }    
     pub fn print(self: &GameImpl) {
         for i in (1..9).rev() {
-            for j in 'A'..'I' {
+            for j in 1..9 {
                 let pos = Pos(j, i);
                 match self.get_piece(pos) {
                     None => print!(" "),
@@ -92,8 +92,6 @@ fn remove(from: Pos, mut game: GameImpl) -> Result<(GameImpl,Piece),String> {
 }
 
 fn is_move_valid (from: Pos, to: Pos, p: Piece) -> Result<Piece,String> {
-    let int_from = int_pos(from)?;
-    let int_to = int_pos(to)?;
     match p {
         Pawn(White) => 
             if from.0 == to.0 {
@@ -107,55 +105,40 @@ fn is_move_valid (from: Pos, to: Pos, p: Piece) -> Result<Piece,String> {
                     Err(format!("Illegal move: Pawn cannot move in such a manner"))
                 }),
         Knight(_) =>
-            match (int_to.0 - int_from.0, int_to.1 - int_from.1) {
-                (1,2) |
-                (-1,2) |
-                (1,-2) |
-                (-1,-2) |
-                (2,1) |
-                (-2,1) |
-                (2,-1) |
-                (-2,-1) => Ok(p),
+            match from - to {
+                Pos(1,2) |
+                Pos(-1,2) |
+                Pos(1,-2) |
+                Pos(-1,-2) |
+                Pos(2,1) |
+                Pos(-2,1) |
+                Pos(2,-1) |
+                Pos(-2,-1) => Ok(p),
                 _ => Err(format!("Illegal move: Knight cannot move in such a manner"))
             }
         Bishop(_) => {
-            let dif_0 = int_to.0 - int_from.0;
-            let dif_1 = int_to.1 - int_from.1;
-            if dif_0 == dif_1 || dif_0 == -dif_1 {
+            let dif = from - to;
+            if dif.0 == dif.1 || dif.0 == -dif.1 {
                 Ok(p)
             } else {
                 Err(format!("Illegal move: Bishop cannot move in such a manner"))
             }
         }
 
-        Rook(_) => match (int_to.0 - int_from.0, int_to.1 - int_from.1) {
-            (_,0) |
-            (0,_) => Ok(p),
+        Rook(_) => match from - to {
+            Pos(_,0) |
+            Pos(0,_) => Ok(p),
             _ => Err(format!("Illegal move: Rook cannot move in such a manner"))
         }
 
-        Queen(_) => match (int_to.0 - int_from.0, int_to.1 - int_from.1) {
-            (_,0) |
-            (0,_) => Ok(p),
-            (n,m) if n == m || n == -m => Ok(p),
+        Queen(_) => match from - to {
+            Pos(_,0) |
+            Pos(0,_) => Ok(p),
+            Pos(n,m) if n == m || n == -m => Ok(p),
             _ => Err(format!("Illegal move: Queen cannot move in such a manner"))
         }
         _ => panic!()
     }
-}
-
-fn int_pos(Pos(x,y): Pos) -> Result<(i8, i8), String> {
-    match x {
-        'A' => Ok(1),
-        'B' => Ok(2),
-        'C' => Ok(3),
-        'D' => Ok(4),
-        'E' => Ok(5),
-        'F' => Ok(6),
-        'G' => Ok(7),
-        'H' => Ok(8),
-        c => Err(format!("Cannot translate '{}' into a number as it's not a valid chessboard letter", c))
-    }.map(|x| (x,y))
 }
 
 impl std::fmt::Display for Piece {

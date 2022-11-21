@@ -6,7 +6,7 @@ use crate::game::GameImpl;
 #[test]
 fn should_be_white_rook_at_1_a() {
     let game = GameImpl::new().unwrap();
-    let pos = Pos('A',1);
+    let pos = Pos::from('A',1).unwrap();
 
     let piece = game.get_piece(pos);
     assert_eq!(piece, Some(&Rook(White)));
@@ -15,7 +15,7 @@ fn should_be_white_rook_at_1_a() {
 #[test]
 fn should_be_white_knight_at_1_b() {
     let game = GameImpl::new().unwrap();
-    let pos = Pos('B',1);
+    let pos = Pos::from('B',1).unwrap();
 
     let piece = game.get_piece(pos);
     assert_eq!(piece, Some(&Knight(White)))
@@ -24,7 +24,7 @@ fn should_be_white_knight_at_1_b() {
 #[test]
 fn getting_piece_shouldnt_remove_it() {
     let game = GameImpl::new().unwrap();
-    let pos = Pos('B',1);
+    let pos = Pos::from('B',1).unwrap();
     let piece1 = game.get_piece(pos);
     let piece2 = game.get_piece(pos);
     assert_eq!(piece1,piece2);
@@ -35,8 +35,8 @@ fn getting_piece_shouldnt_remove_it() {
 #[test]
 fn white_pawn_should_move() {
     let game = GameImpl::new().unwrap();
-    let from = Pos('A',2);
-    let to = Pos('A',3);
+    let from = Pos::from('A',2).unwrap();
+    let to = Pos::from('A',3).unwrap();
     let game = game.move_(from, to).unwrap();
 
     let piece = game.get_piece(to);
@@ -48,8 +48,8 @@ fn white_pawn_should_move() {
 #[test]
 fn white_pawn_cant_move_sideways() {
     let game = GameImpl::new().unwrap();
-    let game = game.move_(Pos('B',2),Pos('B',3)).unwrap();
-    match game.move_(Pos('B',3), Pos('C',3)) {
+    let game = game.move_(Pos::from('B',2).unwrap(),Pos::from('B',3).unwrap()).unwrap();
+    match game.move_(Pos::from('B',3).unwrap(), Pos::from('C',3).unwrap()) {
         Ok (_)  => assert!(false),
         Err (e) => assert_eq!("Illegal move: Pawn cannot move in such a manner", e) 
     }
@@ -58,8 +58,8 @@ fn white_pawn_cant_move_sideways() {
 #[test]
 fn white_pawn_cant_move_backwards() {
     let game = GameImpl::new().unwrap();
-    let game = game.move_(Pos('B',2),Pos('B',3)).unwrap();
-    match game.move_(Pos('B',3),Pos('B',2)) {
+    let game = game.move_(Pos::from('B',2).unwrap(),Pos::from('B',3).unwrap()).unwrap();
+    match game.move_(Pos::from('B',3).unwrap(),Pos::from('B',2).unwrap()) {
         Ok (_) => assert!(false),
         Err (e) => assert_eq!("Illegal move: Pawn cannot move in such a manner", e)
     }
@@ -68,9 +68,9 @@ fn white_pawn_cant_move_backwards() {
 #[test]
 fn white_knight_can_move_in_l_shape() {
     let game = GameImpl::new().unwrap();
-    let game = game.move_(Pos('G',1), Pos('F',3)).unwrap();
+    let game = game.move_(Pos::from('G',1).unwrap(), Pos::from('F',3).unwrap()).unwrap();
     
-    match game.get_piece(Pos('F',3)) {
+    match game.get_piece(Pos::from('F',3).unwrap()) {
         None => assert!(false),
         Some(p) => assert_eq!(&Knight(White), p)
     }
@@ -79,7 +79,7 @@ fn white_knight_can_move_in_l_shape() {
 #[test]
 fn white_knight_cant_move_forward() {
     let game = GameImpl::new().unwrap();
-    match game.move_(Pos('G',1), Pos('G',2)) {
+    match game.move_(Pos::from('G',1).unwrap(), Pos::from('G',2).unwrap()) {
         Err(e) => assert_eq!("Illegal move: Knight cannot move in such a manner",e),
         Ok(_) => assert!(false)
     }
@@ -98,9 +98,9 @@ fn white_bishop_can_move_diagonally() {
         "--------", // 1
     //   ABCDEFGH
     ]).unwrap();
-    let game = game.move_(Pos('D',5), Pos('B',7)).unwrap();
+    let game = game.move_(Pos::from('D',5).unwrap(), Pos::from('B',7).unwrap()).unwrap();
 
-    let p = game.get_piece(Pos('B',7)).expect("Expected: white bishop\nGot: none");
+    let p = game.get_piece(Pos::from('B',7).unwrap()).expect("Expected: white bishop\nGot: none");
     assert_eq!(&Bishop(White), p)
 }
 
@@ -117,7 +117,7 @@ fn white_bishop_cant_move_horizontally() {
         "--------", // 1
     //   ABCDEFGH
     ]).unwrap();
-    match game.move_(Pos('D',5), Pos('B',5)) {
+    match game.move_(Pos::from('D',5).unwrap(), Pos::from('B',5).unwrap()) {
         Err(e) => assert_eq!("Illegal move: Bishop cannot move in such a manner",e),
         Ok(_) => panic!()
     }
@@ -136,9 +136,9 @@ fn white_rook_can_move_vertically() {
         "--------", // 1
     //   ABCDEFGH
     ]).unwrap();
-    let game = game.move_(Pos('D',5), Pos('D',8)).unwrap();
+    let game = game.move_(Pos::from('D',5).unwrap(), Pos::from('D',8).unwrap()).unwrap();
 
-    let p = game.get_piece(Pos('D',8)).expect("Expected: white rook\nGot: none");
+    let p = game.get_piece(Pos::from('D',8).unwrap()).expect("Expected: white rook\nGot: none");
     assert_eq!(&Rook(White), p)
 }
 
@@ -155,9 +155,9 @@ fn white_queen_can_move_diagonally() {
         "--------", // 1
     //   ABCDEFGH
     ]).unwrap();
-    let game = game.move_(Pos('D',5), Pos('B',7)).unwrap();
+    let game = game.move_(Pos::from('D',5).unwrap(), Pos::from('B',7).unwrap()).unwrap();
 
-    let p = game.get_piece(Pos('B',7)).expect("Expected: white queen\nGot: none");
+    let p = game.get_piece(Pos::from('B',7).unwrap()).expect("Expected: white queen\nGot: none");
     assert_eq!(&Queen(White), p)
 }
 
@@ -174,9 +174,9 @@ fn white_queen_can_move_vertically() {
         "--------", // 1
     //   ABCDEFGH
     ]).unwrap();
-    let game = game.move_(Pos('D',5), Pos('D',2)).unwrap();
+    let game = game.move_(Pos::from('D',5).unwrap(), Pos::from('D',2).unwrap()).unwrap();
 
-    let p = game.get_piece(Pos('D',2)).expect("Expected: white queen\nGot: none");
+    let p = game.get_piece(Pos::from('D',2).unwrap()).expect("Expected: white queen\nGot: none");
     assert_eq!(&Queen(White), p)
 }
 
@@ -193,7 +193,7 @@ fn white_queen_cant_move_arbitrarily() {
         "--------", // 1
     //   ABCDEFGH
     ]).unwrap();
-    match game.move_(Pos('D',5), Pos('E',8)) {
+    match game.move_(Pos::from('D',5).unwrap(), Pos::from('E',8).unwrap()) {
         Err(e) => assert_eq!("Illegal move: Queen cannot move in such a manner",e),
         Ok(_) => panic!()
     }
