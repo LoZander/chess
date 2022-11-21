@@ -160,3 +160,41 @@ fn white_queen_can_move_diagonally() {
     let p = game.get_piece(Pos('B',7)).expect("Expected: white queen\nGot: none");
     assert_eq!(&Queen(White), p)
 }
+
+#[test]
+fn white_queen_can_move_vertically() {
+    let game = GameImpl::build_game(&[
+        "--------", // 8
+        "--------", // 7
+        "--------", // 6
+        "---q----", // 5
+        "--------", // 4
+        "--------", // 3
+        "--------", // 2
+        "--------", // 1
+    //   ABCDEFGH
+    ]).unwrap();
+    let game = game.move_(Pos('D',5), Pos('D',2)).unwrap();
+
+    let p = game.get_piece(Pos('D',2)).expect("Expected: white queen\nGot: none");
+    assert_eq!(&Queen(White), p)
+}
+
+#[test]
+fn white_queen_cant_move_arbitrarily() {
+    let game = GameImpl::build_game(&[
+        "--------", // 8
+        "--------", // 7
+        "--------", // 6
+        "---q----", // 5
+        "--------", // 4
+        "--------", // 3
+        "--------", // 2
+        "--------", // 1
+    //   ABCDEFGH
+    ]).unwrap();
+    match game.move_(Pos('D',5), Pos('E',8)) {
+        Err(e) => assert_eq!("Illegal move: Queen cannot move in such a manner",e),
+        Ok(_) => panic!()
+    }
+}

@@ -134,14 +134,11 @@ fn is_move_valid (from: Pos, to: Pos, p: Piece) -> Result<Piece,String> {
             _ => Err(format!("Illegal move: Rook cannot move in such a manner"))
         }
 
-        Queen(_) => {
-            let dif_0 = int_to.0 - int_from.0;
-            let dif_1 = int_to.1 - int_from.1;
-            if dif_0 == dif_1 || dif_0 == -dif_1 {
-                Ok(p)
-            } else {
-                Err(format!("Illegal move: Bishop cannot move in such a manner"))
-            }
+        Queen(_) => match (int_to.0 - int_from.0, int_to.1 - int_from.1) {
+            (_,0) |
+            (0,_) => Ok(p),
+            (n,m) if n == m || n == -m => Ok(p),
+            _ => Err(format!("Illegal move: Queen cannot move in such a manner"))
         }
         _ => panic!()
     }
