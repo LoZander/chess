@@ -122,3 +122,41 @@ fn white_bishop_cant_move_horizontally() {
         Ok(_) => panic!()
     }
 }
+
+#[test]
+fn white_rook_can_move_vertically() {
+    let game = GameImpl::build_game(&[
+        "--------", // 8
+        "--------", // 7
+        "--------", // 6
+        "---r----", // 5
+        "--------", // 4
+        "--------", // 3
+        "--------", // 2
+        "--------", // 1
+    //   ABCDEFGH
+    ]).unwrap();
+    let game = game.move_(Pos('D',5), Pos('D',8)).unwrap();
+
+    let p = game.get_piece(Pos('D',8)).expect("Expected: white rook\nGot: none");
+    assert_eq!(&Rook(White), p)
+}
+
+#[test]
+fn white_queen_can_move_diagonally() {
+    let game = GameImpl::build_game(&[
+        "--------", // 8
+        "--------", // 7
+        "--------", // 6
+        "---q----", // 5
+        "--------", // 4
+        "--------", // 3
+        "--------", // 2
+        "--------", // 1
+    //   ABCDEFGH
+    ]).unwrap();
+    let game = game.move_(Pos('D',5), Pos('B',7)).unwrap();
+
+    let p = game.get_piece(Pos('B',7)).expect("Expected: white queen\nGot: none");
+    assert_eq!(&Queen(White), p)
+}
