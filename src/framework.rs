@@ -1,4 +1,6 @@
 use std::ops::Sub;
+use crate::framework::Piece::*;
+use crate::framework::Player::*;
 
 pub trait Game {
     type Game;
@@ -12,6 +14,13 @@ pub trait Gui {
 
 #[derive(Debug)]
 #[derive(PartialEq)]
+pub enum Player {
+    White,
+    Black,
+}
+
+#[derive(Debug)]
+#[derive(PartialEq)]
 pub enum Piece {
     Pawn(Player),
     Rook(Player),
@@ -21,12 +30,25 @@ pub enum Piece {
     Queen(Player)
 }
 
+impl std::fmt::Display for Piece {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        let symbol = match self {
+            King(Black) => '\u{2654}',
+            Queen(Black) => '\u{2655}',
+            Rook(Black) => '\u{2656}',
+            Bishop(Black) => '\u{2657}',
+            Knight(Black) => '\u{2658}',
+            Pawn(Black) => '\u{2659}',
+            King(White) => '\u{265A}',
+            Queen(White) => '\u{265B}',
+            Rook(White) => '\u{265C}',
+            Bishop(White) => '\u{265D}',
+            Knight(White) => '\u{265E}',
+            Pawn(White) => '\u{265F}',
+        };
 
-#[derive(Debug)]
-#[derive(PartialEq)]
-pub enum Player {
-    White,
-    Black,
+        write!(f, "{symbol}")
+    }
 }
 
 
